@@ -79,8 +79,12 @@ public class GISUtils {
 	public static boolean isOnTheWay(Location loc, Way way) {
 		if ( way == null )
 			return false;
-		
-		return isOnTheWay(loc, way.nodes, OSMClient.WAY_RADIUS_METERS);
+
+		// triple the regular way width to account for accuracy loss
+		boolean onTheWay = isOnTheWay(loc, way.nodes, 3 * OSMClient.WAY_RADIUS_METERS);
+		Log.d(TAG, "Location " + loc.getLatitude() + " " + loc.getLongitude() + " way " + way.toString() + " " + onTheWay);
+		return onTheWay;
+
 	}
 	
 }

@@ -13,7 +13,11 @@ public class Way {
 	public static final String TAG_MAXSPEED = "maxspeed";
 	public static final String TAG_ROAD_NAME = "name";
 	public static final String TAG_ROAD_REF = "ref";
-	
+
+	public static final double KPH_TO_MS = 0.277778D;
+	public static final double MPH_TO_MS = 0.44704D;
+	public static final double KNOTS_TO_MS = 0.514444D;
+
 	@Attribute(name="id")
 	public Long id;
 	
@@ -29,9 +33,28 @@ public class Way {
 		return null;
 	}
 	
-	public String getMaxSpeed() {
-		if ( tags != null )
-			return tags.get(TAG_MAXSPEED);
+	/**
+	 * Returns maxspeed in m/s
+	 * or NULL if unknown
+	 * @return
+	 */
+	public Double getMaxSpeed() {
+		if ( tags != null ) {
+			String maxSpeed = tags.get(TAG_MAXSPEED);
+			String[] comp = maxSpeed.split(" ");
+			Double speedValue = Double.parseDouble(comp[0]);
+			// default unit is kph
+			Double multiplier = KPH_TO_MS;
+			if ( comp.length > 1 ) {
+				if ( comp[1].equalsIgnoreCase("mph") ) {
+					multiplier = MPH_TO_MS;
+				}
+				if ( comp[1].equalsIgnoreCase("knots") ) {
+					multiplier = KNOTS_TO_MS;
+				}
+			}
+			return speedValue * multiplier;
+		}
 		return null;
 	}
 	
