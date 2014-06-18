@@ -56,6 +56,7 @@ public class OSMLocationListener {
 	}
 	
 	protected void setCurrentWay(Way w) {
+		Log.i(TAG,"Got OSM way " + w.toString());
 		if ( ls != null && w != currentWay ) { 
 			ls.onOSMWayChangedListener(w);
 		}
@@ -64,6 +65,8 @@ public class OSMLocationListener {
 	
 	protected class LocationChangeListener implements LocationListener {
 		public void onLocationChanged(final Location arg0) {
+			
+			Log.i(TAG,"Location changed " + arg0.toString());
 
 			// GPS location changed, request new way from OSM if outside current way
 			if ( currentWay == null || !GISUtils.isOnTheWay(arg0, currentWay) ) {

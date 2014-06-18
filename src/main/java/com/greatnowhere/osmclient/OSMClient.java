@@ -36,6 +36,7 @@ public class OSMClient {
 	}
 	
 	public void getWay(Location loc, RequestListener<Response> requestListener) {
+		Log.i(TAG,"OSM request lat=" + loc.getLatitude() + " lng=" + loc.getLongitude()); 
 		sm.execute(new OSMXAPIRequest(loc, WAY_RADIUS_METERS), requestListener);
 	}
 	

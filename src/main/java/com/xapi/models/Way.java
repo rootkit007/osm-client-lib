@@ -7,7 +7,11 @@ import org.simpleframework.xml.Attribute;
 import org.simpleframework.xml.ElementList;
 import org.simpleframework.xml.ElementMap;
 
+import android.util.Log;
+
 public class Way {
+	
+	private static final String TAG = Way.class.getCanonicalName();
 
 	public static final String TAG_HIGHWAY_TYPE = "highway";
 	public static final String TAG_MAXSPEED = "maxspeed";
@@ -41,19 +45,27 @@ public class Way {
 	public Double getMaxSpeed() {
 		if ( tags != null ) {
 			String maxSpeed = tags.get(TAG_MAXSPEED);
-			String[] comp = maxSpeed.split(" ");
-			Double speedValue = Double.parseDouble(comp[0]);
-			// default unit is kph
-			Double multiplier = KPH_TO_MS;
-			if ( comp.length > 1 ) {
-				if ( comp[1].equalsIgnoreCase("mph") ) {
-					multiplier = MPH_TO_MS;
+			if ( maxSpeed != null && !maxSpeed.isEmpty() ) {
+				String[] comp = maxSpeed.split(" ");
+				Double speedValue = 0D;
+				try {
+					speedValue = Double.parseDouble(comp[0]);
+				} catch (Exception ex) {
+					Log.w(TAG,"Error converting speed limit value " + comp[0]);
+					return null;
 				}
-				if ( comp[1].equalsIgnoreCase("knots") ) {
-					multiplier = KNOTS_TO_MS;
+				// default unit is kph
+				Double multiplier = KPH_TO_MS;
+				if ( comp.length > 1 ) {
+					if ( comp[1].equalsIgnoreCase("mph") ) {
+						multiplier = MPH_TO_MS;
+					}
+					if ( comp[1].equalsIgnoreCase("knots") ) {
+						multiplier = KNOTS_TO_MS;
+					}
 				}
+				return speedValue * multiplier;
 			}
-			return speedValue * multiplier;
 		}
 		return null;
 	}
