@@ -82,7 +82,7 @@ public class GISUtils {
 
 		// triple the regular way width to account for accuracy loss
 		boolean onTheWay = isOnTheWay(loc, way.nodes, 3 * OSMClient.WAY_RADIUS_METERS);
-		Log.d(TAG, "Location " + loc.getLatitude() + " " + loc.getLongitude() + " way " + way.toString() + " " + onTheWay);
+		Log.d(TAG, "Location " + loc.getLatitude() + " " + loc.getLongitude() + " way " + way.toString() + " result " + onTheWay);
 		return onTheWay;
 
 	}
