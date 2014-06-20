@@ -18,7 +18,7 @@ public class OSMClient {
 
 	private String serviceURL;
 	private SpiceManager sm = new SpiceManager(XmlSpringAndroidSpiceService.class);
-	public static final double WAY_RADIUS_METERS = 3D;
+	public static final double WAY_RADIUS_METERS = 10D;
 	public static final String DEFAULT_SERVICE_URL = "http://www.overpass-api.de/api/xapi?*";
 
 	public OSMClient(Context ctx) {

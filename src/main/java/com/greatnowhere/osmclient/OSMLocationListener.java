@@ -1,6 +1,7 @@
 package com.greatnowhere.osmclient;
 
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import com.octo.android.robospice.persistence.exception.SpiceException;
 import com.octo.android.robospice.request.listener.RequestListener;
@@ -30,6 +31,9 @@ public class OSMLocationListener {
 	protected Location currentLocation;
 	protected long currentLocationTimeStamp;
 	protected GPSStatusChangeListener gpsStatusListener;
+	// settings for max concurrent requests
+	protected int maxRequests = 1;
+	protected AtomicInteger currentRequests = new AtomicInteger(0);
 	
 	public OSMLocationListener(Context ctx) {
 		client = new OSMClient(ctx);
@@ -40,6 +44,16 @@ public class OSMLocationListener {
 		client.stop();
 		removeLocationListener();
 		ls = null;
+	}
+	
+	/**
+	 * Limits the number of concurrent OSM requests
+	 * This means location info will not be looked up when location changes, and previous request(s) have 
+	 * not yet been finished
+	 * @param r
+	 */
+	public void setMaxRequests(int r) {
+		maxRequests = r;
 	}
 	
 	public void setOSMWayListener(OSMWayChangedListener listener) {
@@ -89,11 +103,18 @@ public class OSMLocationListener {
 			currentLocation = arg0;
 			currentLocationTimeStamp = SystemClock.elapsedRealtime();
 
+			if ( currentRequests.get() >= maxRequests ) {
+				Log.w(TAG, "Skipping OSM request, too many in progress: " + currentRequests.get());
+				return;
+			}
+			
 			// GPS location changed, request new way from OSM if outside current way
 			if ( currentWay == null || !GISUtils.isOnTheWay(arg0, currentWay) ) {
 				// Make OSM request
+				currentRequests.addAndGet(1);
 				client.getWay(arg0, new RequestListener<Response>() {
 					public void onRequestSuccess(Response result) {
+						currentRequests.decrementAndGet();
 						if ( result == null || result.getMainWay() == null ) {
 							Log.w(TAG,"NULL OSM result or way");
 							setCurrentWay(null);
@@ -103,6 +124,7 @@ public class OSMLocationListener {
 					}
 					
 					public void onRequestFailure(SpiceException spiceException) {
+						currentRequests.decrementAndGet();
 						Log.w(TAG, "Network request failed: " + spiceException.getLocalizedMessage());
 						setCurrentWay(null);
 					}
