@@ -14,6 +14,7 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
+import android.os.Looper;
 import android.os.SystemClock;
 import android.util.Log;
 
@@ -52,11 +53,17 @@ public class OSMLocationListener {
 	}
 	
 	protected void setUpLocationListener() {
+		checkLooper();
 		removeLocationListener();
 		lcs = new LocationChangeListener();
 		lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000L, 10, lcs);
 		gpsStatusListener = new GPSStatusChangeListener();
 		lm.addGpsStatusListener(gpsStatusListener);
+	}
+	
+	protected void checkLooper() {
+		if ( Looper.myLooper() == null )
+			Looper.prepare();
 	}
 	
 	protected void removeLocationListener() {
@@ -89,6 +96,7 @@ public class OSMLocationListener {
 					public void onRequestSuccess(Response result) {
 						if ( result == null || result.getMainWay() == null ) {
 							Log.w(TAG,"NULL OSM result or way");
+							setCurrentWay(null);
 							return;
 						}
 						setCurrentWay(result.getMainWay());
