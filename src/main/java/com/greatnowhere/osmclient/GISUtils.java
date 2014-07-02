@@ -84,7 +84,30 @@ public class GISUtils {
 		boolean onTheWay = isOnTheWay(loc, way.nodes, 3 * OSMClient.WAY_RADIUS_METERS);
 		Log.d(TAG, "Location " + loc.getLatitude() + " " + loc.getLongitude() + " way " + way.toString() + " result " + onTheWay);
 		return onTheWay;
-
 	}
 	
+	public static double getDistance(double startLatitude,double startLongitude, double endLatitude, double endLongitude) {
+		float[] results = new float[2];
+		Location.distanceBetween(startLatitude, startLongitude, endLatitude, endLongitude, results);
+		return results[0];
+	}
+	
+	public static double getBearing(double startLatitude,double startLongitude, double endLatitude, double endLongitude) {
+		float[] results = new float[2];
+		Location.distanceBetween(startLatitude, startLongitude, endLatitude, endLongitude, results);
+		return results[1];
+	}
+	
+	public static double getBearingDifference(double a1, double a2) {
+	    return Math.min((a1-a2)<0?a1-a2+360:a1-a2, (a2-a1)<0?a2-a1+360:a2-a1);
+	}
+
+	public static double getUnsignedBearingDifference(double a1, double a2) {
+		a1 = Math.abs(a1);
+		a2 = Math.abs(a2);
+	    if ( a1 > 180 ) a1 -= 180;
+	    if ( a2 > 180 ) a2 -= 180;
+	    return Math.abs(getBearingDifference(a1, a2));
+	}
+
 }

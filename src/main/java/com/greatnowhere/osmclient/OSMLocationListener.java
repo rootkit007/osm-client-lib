@@ -41,6 +41,7 @@ public class OSMLocationListener {
 	}
 	
 	public void stop() {
+		Log.i(TAG,"stop");
 		client.stop();
 		removeLocationListener();
 		ls = null;
@@ -69,6 +70,7 @@ public class OSMLocationListener {
 	protected void setUpLocationListener() {
 		checkLooper();
 		removeLocationListener();
+		Log.i(TAG,"setting up location listeners");
 		lcs = new LocationChangeListener();
 		lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000L, 10, lcs);
 		gpsStatusListener = new GPSStatusChangeListener();
@@ -82,9 +84,12 @@ public class OSMLocationListener {
 	
 	protected void removeLocationListener() {
 		if ( lcs != null ) {
+			Log.i(TAG,"removing location listeners");
 			lm.removeUpdates(lcs);
 			lm.removeGpsStatusListener(gpsStatusListener);
+			lcs = null;
 			gpsStatusListener = null;
+			currentRequests.set(0);
 		}
 	}
 	
@@ -120,7 +125,7 @@ public class OSMLocationListener {
 							setCurrentWay(null);
 							return;
 						}
-						setCurrentWay(result.getMainWay());
+						setCurrentWay(result.getMainWay(arg0.getBearing(),arg0.getLatitude(),arg0.getLongitude()));
 					}
 					
 					public void onRequestFailure(SpiceException spiceException) {
